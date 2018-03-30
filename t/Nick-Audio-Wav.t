@@ -38,7 +38,7 @@ $write -> close();
 is(
     md5_hex( $$write_ref ),
     '3836d0c0c3c953a6eb4fc4dc73b93467',
-    'Expected file contents.'
+    'expected file contents'
 );
 
 package MockWavWrite;

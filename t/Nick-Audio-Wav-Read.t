@@ -58,7 +58,7 @@ is_deeply(
             'label'     => 'Cue 1',
             'note'      => 'cue point'
         }
-    }, 'get_cues()'
+    }, 'get_cues'
 );
 
 is(

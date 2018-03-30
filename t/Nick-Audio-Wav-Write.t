@@ -27,7 +27,7 @@ $wav -> close();
 is(
     md5_hex( $$fh_scalar ),
     '21df4627b1cb29685c015a7d864359c5',
-    'Expected file contents.'
+    'expected file contents'
 );
 
 package MockWavWrite;
