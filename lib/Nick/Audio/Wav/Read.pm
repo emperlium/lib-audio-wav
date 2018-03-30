@@ -224,11 +224,10 @@ sub _open {
             );
         if ( $head eq 'fmt ' ) {
             $unpack = $PACK{'wav'};
-            $self -> _read_bytes( $len );
             @$self{
                 @{ $$unpack[0] }
-            } = unpack(
-                $$unpack[1], $WAV_BUFFER
+            } = $self -> _read_and_unpack(
+                $len, $$unpack[1]
             );
             $head = delete $$self{'format'};
             ( $$self{'wave-ex'} = ( $head == 65534 ) || 0 )
@@ -252,11 +251,10 @@ sub _open {
                 );
                 for ( ; $i > 0; $i -- ) {
                     my %cue;
-                    $self -> _read_bytes( 24 );
                     @cue{
                         @{ $$unpack[0] }
-                    } = unpack(
-                        $$unpack[1], $WAV_BUFFER
+                    } = $self -> _read_and_unpack(
+                        24, $$unpack[1]
                     );
                     $cues{ delete $cue{'id'} } = \%cue;
                 }
@@ -278,10 +276,7 @@ sub _open {
                         if ( $head eq 'labl' || $head eq 'note' ) {
                             $i -= 4;
                             $unpack = $self -> _read_long();
-                            $self -> _read_bytes( $i );
-                            $$self{$head}{$unpack} = unpack(
-                                'Z' . $i, $WAV_BUFFER
-                            );
+                            $$self{$head}{$unpack} = $self -> _read_string( $i );
                         } else {
                             $self -> _skip_bytes( $i );
                         }
@@ -295,12 +290,9 @@ sub _open {
                     $i % 2 and $i++;
                     $len -= 4 + $i;
                     if ( exists $INFO{$head} ) {
-                        $self -> _read_bytes( $i );
                         $$self{'info'}{
                             $INFO{$head}
-                        } = unpack(
-                            'Z' . $i, $WAV_BUFFER
-                        );
+                        } = $self -> _read_string( $i );
                     } else {
                         $self -> _skip_bytes( $i );
                     }
@@ -310,10 +302,7 @@ sub _open {
             $len -= 4;
             $len % 2 and $len++;
             if ( $self -> _read_long() == 1 ) {
-                $self -> _read_bytes( $len );
-                $$self{'info'}{'title'} = unpack(
-                    'Z' . $i, $WAV_BUFFER
-                );
+                $$self{'info'}{'title'} = $self -> _read_string( $len );
            } else {
                $self -> _skip_bytes( $len );
            }
@@ -357,9 +346,18 @@ sub _read_dword {
 }
 
 sub _read_long {
-    $_[0] -> _read_bytes( 4 );
+    return $_[0] -> _read_and_unpack( 4, 'V' );
+}
+
+sub _read_string {
+    return $_[0] -> _read_and_unpack( $_[1], 'Z' . $_[1] );
+}
+
+sub _read_and_unpack {
+    my( $self, $len, $pack ) = @_;
+    $self -> _read_bytes( $len );
     return unpack(
-        'V' => $WAV_BUFFER
+        $pack => $WAV_BUFFER
     );
 }
 
