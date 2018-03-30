@@ -74,6 +74,10 @@ The other keys are optional;
 
 Whether the file format is WAVE-FORMAT-EXTENSIBLE.
 
+=item buffer_in
+
+A reference to a scalar which will be used instead of B<$WAV_BUFFER>.
+
 =back
 
 =head2 write
@@ -139,6 +143,13 @@ sub new {
     ), 44;
     @$self{ qw( pos_riff pos_data len_riff len_data ) }
         = ( 4, 40, 36, 0 );
+    if ( exists $$self{'buffer_in'} ) {
+        ref( $$self{'buffer_in'} ) eq 'SCALAR'
+            or $self -> throw(
+                'Expecting buffer_in to be a reference to a scalar.'
+            );
+        bless $self => $class . '::UserBuffer';
+    }
     return $self;
 }
 
@@ -225,6 +236,15 @@ sub _write_cues {
         syswrite $fh, 'LIST' . pack( 'V', $pos ) . 'adtl' . $adtl;
         $$self{'len_riff'} += $pos + 8;
     }
+}
+
+package Nick::Audio::Wav::Write::UserBuffer;
+
+use base 'Nick::Audio::Wav::Write';
+
+sub write {
+    my( $self ) = @_;
+    $$self{'len_data'} += syswrite $$self{'fh'}, ${ $$self{'buffer_in'} };
 }
 
 1;

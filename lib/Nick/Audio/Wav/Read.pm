@@ -44,6 +44,8 @@ Instantiates a new Nick::Audio::Wav::Read object.
 
 Takes a single parameter, the WAV file to read.
 
+It can also take a second optional parameter, a reference to a scalar which will be used instead of B<$WAV_BUFFER>.
+
 =head2 read()
 
 Takes a number of bytes to read as an argument, returns the number of bytes read.
@@ -109,7 +111,7 @@ The key is the cue ID, the value is a reference to a hash containing B<position>
 =cut
 
 sub new {
-    my( $class, $file ) = @_;
+    my( $class, $file, $buffer ) = @_;
     -f $file or $class -> throw(
         'Missing file: ' . $file
     );
@@ -123,6 +125,14 @@ sub new {
     } catch Nick::Error with {
         $_[0] -> rethrow( 'Problem opening ' . $file )
     };
+    if ( $buffer ) {
+        ref( $buffer ) eq 'SCALAR'
+            or $self -> throw(
+                'Expecting buffer to be a reference to a scalar.'
+            );
+        $$self{'buffer'} = $buffer;
+        bless $self => $class . '::UserBuffer';
+    }
     return $self;
 }
 
@@ -358,6 +368,17 @@ sub _read_and_unpack {
     $self -> _read_bytes( $len );
     return unpack(
         $pack => $WAV_BUFFER
+    );
+}
+
+package Nick::Audio::Wav::Read::UserBuffer;
+
+use base 'Nick::Audio::Wav::Read';
+
+sub _read_bytes {
+    my( $self, $len ) = @_;
+    $$self{'pos'} += CORE::read(
+        $$self{'fh'}, ${ $$self{'buffer'} }, $len
     );
 }
 

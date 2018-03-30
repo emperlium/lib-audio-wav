@@ -60,6 +60,8 @@ Instantiates a new Nick::Audio::Wav::Read object.
 
 Takes a single parameter, the WAV file to read.
 
+It can also take a second optional parameter, a reference to a scalar which will be used instead of **$WAV\_BUFFER**.
+
 ### read()
 
 Takes a number of bytes to read as an argument, returns the number of bytes read.
@@ -145,6 +147,10 @@ The other keys are optional;
 - wave-ex
 
     Whether the file format is WAVE-FORMAT-EXTENSIBLE.
+
+- buffer\_in
+
+    A reference to a scalar which will be used instead of **$WAV\_BUFFER**.
 
 ### write
 

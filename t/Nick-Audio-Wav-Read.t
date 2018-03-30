@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Digest::MD5 'md5_base64';
 
 BEGIN {
@@ -70,4 +70,12 @@ is(
     md5_base64( $WAV_BUFFER ),
     '6g1pu6SSyYz4nVYYwa8isA',
     'read bytes'
+);
+
+my $buffer;
+Nick::Audio::Wav::Read -> new( 'test.wav', \$buffer ) -> read( 4000 );
+is(
+    md5_base64( $buffer ),
+    '6g1pu6SSyYz4nVYYwa8isA',
+    'user-supplied buffer'
 );
