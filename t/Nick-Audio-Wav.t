@@ -17,7 +17,7 @@ my $write = MockWavWrite -> new(
 my $write_ref = $$write{'fh'} -> string_ref();
 
 while (
-    $read -> read( 512 )
+    $read -> read()
 ) {
     $write -> write();
 }

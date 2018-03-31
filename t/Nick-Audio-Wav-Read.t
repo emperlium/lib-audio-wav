@@ -62,7 +62,7 @@ is_deeply(
 );
 
 is(
-    $wav -> read( 4000 ),
+    $wav -> read(),
     4000,
     'read length'
 );

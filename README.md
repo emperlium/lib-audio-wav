@@ -12,9 +12,11 @@ You'll also need to install the lib-base repository from this account.
 
 ## Reading Example
 
-    use Nick::Audio::Wav::Read '$WAV_BUFFER';
+    use Nick::Audio::Wav::Read qw( $WAV_BUFFER $WAV_BLOCK );
 
     use Nick::Audio::PulseAudio;
+
+    $WAV_BLOCK = 512;
 
     my $wav = Nick::Audio::Wav::Read -> new( 'test.wav' );
 
@@ -25,7 +27,7 @@ You'll also need to install the lib-base repository from this account.
     );
 
     while (
-        $wav -> read( 512 )
+        $wav -> read()
     ) {
         $pulse -> play();
     }
@@ -64,9 +66,11 @@ It can also take a second optional parameter, a reference to a scalar which will
 
 ### read()
 
-Takes a number of bytes to read as an argument, returns the number of bytes read.
+Optionally takes a number of bytes to read as an argument, returns the number of bytes read.
 
 The data is read into the **$WAV\_BUFFER** scalar, which is exported by the module.
+
+The default number of bytes to read is 8192. This can be changed by importing and changing **$WAV\_BLOCK**.
 
 ### details()
 

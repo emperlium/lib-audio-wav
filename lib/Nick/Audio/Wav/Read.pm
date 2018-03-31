@@ -8,7 +8,8 @@ use base 'Nick::Audio::Wav';
 use Nick::Audio::Wav qw( $WAV_BUFFER %PACK %INFO );
 use Nick::Error ':try';
 
-our @EXPORT_OK = qw( $WAV_BUFFER );
+our $WAV_BLOCK = 8192;
+our @EXPORT_OK = qw( $WAV_BUFFER $WAV_BLOCK );
 
 =pod
 
@@ -18,9 +19,11 @@ Nick::Audio::Wav::Read - Module for reading uncompressed WAV files.
 
 =head1 SYNOPSIS
 
-    use Nick::Audio::Wav::Read '$WAV_BUFFER';
+    use Nick::Audio::Wav::Read qw( $WAV_BUFFER $WAV_BLOCK );
 
     use Nick::Audio::PulseAudio;
+
+    $WAV_BLOCK = 512;
 
     my $wav = Nick::Audio::Wav::Read -> new( 'test.wav' );
 
@@ -31,7 +34,7 @@ Nick::Audio::Wav::Read - Module for reading uncompressed WAV files.
     );
 
     while (
-        $wav -> read( 512 )
+        $wav -> read()
     ) {
         $pulse -> play();
     }
@@ -48,9 +51,11 @@ It can also take a second optional parameter, a reference to a scalar which will
 
 =head2 read()
 
-Takes a number of bytes to read as an argument, returns the number of bytes read.
+Optionally takes a number of bytes to read as an argument, returns the number of bytes read.
 
 The data is read into the B<$WAV_BUFFER> scalar, which is exported by the module.
+
+The default number of bytes to read is 8192. This can be changed by importing and changing B<$WAV_BLOCK>.
 
 =head2 details()
 
@@ -194,6 +199,7 @@ sub get_cues {
 
 sub read {
     my( $self, $len ) = @_;
+    $len ||= $WAV_BLOCK;
     $$self{'pos'} + $len > $$self{'data_finish'}
         and $len = $$self{'data_finish'} - $$self{'pos'};
     $len && $len > 0 or return undef;
