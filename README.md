@@ -74,7 +74,7 @@ The default number of bytes to read is 8192. This can be changed by importing an
 
 ### details()
 
-Returns a hash with the following elements.
+Returns either a hash or reference (depending on context) with the following elements.
 
 - channels
 
