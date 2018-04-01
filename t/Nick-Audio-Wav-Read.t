@@ -13,7 +13,9 @@ my $wav = Nick::Audio::Wav::Read -> new( 'test.wav' );
 is( $wav -> length_seconds(), 0.5, 'length_seconds' );
 
 is_deeply(
-    { $wav -> details() }, {
+    scalar(
+        $wav -> details()
+    ), {
         'channels'      => 1,
         'sample_rate'   => 8000,
         'bits_sample'   => 8,

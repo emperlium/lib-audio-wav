@@ -143,7 +143,7 @@ sub new {
 
 sub details {
     my( $self ) = @_;
-    return(
+    my %details = (
         'length' => $self -> length_seconds(),
         'samples'=> $self -> samples(),
         map(
@@ -151,6 +151,7 @@ sub details {
             qw( channels sample_rate bits_sample info )
         )
     );
+    return wantarray ? %details : \%details;
 }
 
 sub get_sample_rate {
