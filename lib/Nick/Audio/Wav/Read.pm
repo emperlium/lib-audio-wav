@@ -113,6 +113,10 @@ Returns a reference to a hash containing any labl/cue chunks found in the file.
 
 The key is the cue ID, the value is a reference to a hash containing B<position> (sample offset), B<label> and B<note> entries.
 
+=head2 rewind
+
+Moves the filehandle position back to the start of the audio data.
+
 =cut
 
 sub new {
@@ -206,6 +210,12 @@ sub read {
     $len && $len > 0 or return undef;
     $self -> _read_bytes( $len );
     return $len;
+}
+
+sub rewind {
+    my( $self ) = @_;
+    seek $$self{'fh'}, $$self{'data_start'}, 0;
+    $$self{'pos'} = $$self{'data_start'};
 }
 
 sub _open {
